@@ -52,8 +52,11 @@ it's what password-reset emails are sent through.
 3. Open the instance and copy the **AMQP URL** from the details page. It looks like
    `amqps://someuser:somepassword@some-host.rmq.cloudamqp.com/someuser`.
 4. Pull the pieces out of that URL — you'll need them separately in Render:
-   - Host: the part after `@` and before the next `/` (e.g. `some-host.rmq.cloudamqp.com`)
-   - Username and password: the parts before `@`
+   - Username: right after `amqps://`, before the `:`
+   - Password: between the `:` and the `@`
+   - Host: between `@` and the next `/` (e.g. `some-host.rmq.cloudamqp.com`)
+   - Vhost: everything after that last `/` — CloudAMQP's free plan gives you your own
+     virtual host instead of the default one, and the app needs to be told what it is
    - Port: CloudAMQP's free tier uses TLS on port `5671`, not the default `5672`
 
 
@@ -75,6 +78,7 @@ it's what password-reset emails are sent through.
    | `RABBITMQ_PORT` | `5671` |
    | `RABBITMQ_USERNAME` | the username from that same URL |
    | `RABBITMQ_PASSWORD` | the password from that same URL |
+   | `RABBITMQ_VHOST` | the vhost from that same URL (the part after the last `/`) |
    | `RABBITMQ_SSL` | `true` |
    | `JWT_SECRET` | generate one: run `openssl rand -base64 32` locally and paste the output |
    | `MAIL_USERNAME` | optional — your Gmail address, only if you want password-reset emails to work (see README) |
@@ -85,7 +89,7 @@ it's what password-reset emails are sent through.
    Don't set `PORT` — Render sets that automatically and the app now reads it.
 6. Click **Create Web Service**. First build takes a few minutes (it's compiling
    the whole app). Watch the logs; once it says the app started, copy the public
-   URL Render gives you (something like `https://unibank-xxxx.onrender.com`).
+   URL Render gives you (something like `https://maplebank-xxxx.onrender.com`).
 7. Sanity check: visit `https://<your-render-url>/swagger-ui.html` — you should see
    the API docs load.
 
@@ -103,7 +107,7 @@ it's what password-reset emails are sent through.
    | `VITE_API_URL` | `https://<your-render-url>/api` (from step 3, with `/api` on the end) |
 
 5. Click **Deploy**. A couple minutes later you'll get your live link, something like
-   `https://unibank-xxxx.vercel.app` — that's the link you share.
+   `https://maplebank-xxxx.vercel.app` — that's the link you share.
 
 
 ## 5. Wire the two together
@@ -112,7 +116,7 @@ The backend needs to know the frontend's real URL, both to allow it through CORS
 to build the link inside password-reset emails.
 
 1. Back in Render, open your web service → **Environment** → update:
-   - `FRONTEND_URL` → your Vercel URL (e.g. `https://unibank-xxxx.vercel.app`)
+   - `FRONTEND_URL` → your Vercel URL (e.g. `https://maplebank-xxxx.vercel.app`)
    - `ALLOWED_ORIGINS` → the same Vercel URL
 2. Save — Render will automatically redeploy with the new values.
 
