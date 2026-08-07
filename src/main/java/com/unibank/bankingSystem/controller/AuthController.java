@@ -1,8 +1,10 @@
 package com.unibank.bankingSystem.controller;
 
 import com.unibank.bankingSystem.dto.AuthResponse;
+import com.unibank.bankingSystem.dto.ForgotPasswordRequest;
 import com.unibank.bankingSystem.dto.LoginRequest;
 import com.unibank.bankingSystem.dto.RegisterRequest;
+import com.unibank.bankingSystem.dto.ResetPasswordRequest;
 import com.unibank.bankingSystem.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,5 +27,15 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@RequestBody LoginRequest request) {
         return authService.login(request);
+    }
+
+    @PostMapping("/forgot-password")
+    public void forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+    }
+
+    @PostMapping("/reset-password")
+    public void resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
     }
 }

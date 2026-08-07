@@ -21,13 +21,13 @@ A good bug report includes:
 - What actually happened, including any error messages or stack traces
 - Your environment: Java version, MySQL version, OS
 
-[Open a bug report](https://github.com/j0hn-char/UniBank/issues/new?template=bug_report.md)
+[Open a bug report](https://github.com/mansikananidev-creator/MapleBank/issues/new?template=bug_report.md)
 
 ## Suggesting Features
 
 Feature requests are welcome. Please describe the problem you want to solve, not just the solution, so we can discuss the best approach.
 
-[Open a feature request](https://github.com/j0hn-char/UniBank/issues/new?template=feature_request.md)
+[Open a feature request](https://github.com/mansikananidev-creator/MapleBank/issues/new?template=feature_request.md)
 
 ## Submitting a Pull Request
 

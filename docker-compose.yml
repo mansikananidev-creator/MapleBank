@@ -1,0 +1,67 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: unibank
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-changeme}
+    ports:
+      # Host side is 3307, not MySQL's usual 3306, in case you already have a local
+      # MySQL install using that port. The backend still talks to this container over
+      # 3306 internally (see DB_URL below) - this only affects connecting from tools
+      # on your own computer, e.g. MySQL Workbench, which would use localhost:3307.
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "5672:5672"   # AMQP - what the backend actually connects to
+      - "15672:15672" # management UI - http://localhost:15672, login with the creds above
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      # Points the backend at the "mysql" service by its Compose network hostname
+      # instead of localhost - see DB_URL in application.properties.
+      DB_URL: jdbc:mysql://mysql:3306/unibank
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
+      # Same idea for RabbitMQ - "rabbitmq" is this compose network's hostname for it.
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      # Same local-dev fallback the app uses when run outside Docker - override in
+      # your .env for anything beyond local demo use (see README Security notes).
+      JWT_SECRET: ${JWT_SECRET:-lRBV1qEs8tPdgI3OZK6LuoTfWoovmur5rvkuY06xTwM=}
+      # Optional - leave unset to skip real email delivery (see README). Set both in
+      # a .env file to enable forgot/reset password emails.
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    ports:
+      - "8081:8081"
+
+volumes:
+  mysql-data:

@@ -1,7 +1,9 @@
 import axios from "axios";
 
+// VITE_API_URL lets a deployed frontend (e.g. on Vercel) point at the deployed
+// backend instead of localhost - set it in that host's environment variables.
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api'
+    baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8081/api'
 })
 
 api.interceptors.request.use((config) => {

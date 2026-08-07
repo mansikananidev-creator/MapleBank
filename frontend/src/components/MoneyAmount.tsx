@@ -27,5 +27,5 @@ export function isInbound(type: TransType) {
 }
 
 export function formatCurrency(amount: number, maximumFractionDigits = 2) {
-    return new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'EUR', maximumFractionDigits }).format(amount)
+    return new Intl.NumberFormat('el-GR', { style: 'currency', currency: 'CAD', maximumFractionDigits }).format(amount)
 }

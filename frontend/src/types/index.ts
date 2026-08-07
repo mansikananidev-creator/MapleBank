@@ -9,6 +9,7 @@ export type TransType =
     | "LOAN_DISBURSEMENT"
     | "LOAN_REPAYMENT"
 export type LoanStatus = "PENDING" | "APPROVED" | "REJECTED" | "ACTIVE" | "PAID_OFF"
+export type Frequency = "WEEKLY" | "MONTHLY"
 
 export interface AuthResponse {
     token: string
@@ -66,4 +67,50 @@ export interface Page<T> {
     size: number
     first: boolean
     last: boolean
+}
+
+export interface ComplianceFlagResponse {
+    id: number
+    transactionId: number
+    accountNumber: string
+    accountOwnerName: string
+    transactionType: TransType
+    amount: number
+    reason: string
+    reviewed: boolean
+    reviewedByUsername: string | null
+    reviewedAt: string | null
+    createdAt: string
+}
+
+export interface RecurringPaymentResponse {
+    id: number
+    fromAccountNumber: string
+    toAccountNumber: string
+    amount: number
+    description: string
+    frequency: Frequency
+    nextRunDate: string
+    active: boolean
+}
+
+export interface MonthlySummaryResponse {
+    month: string
+    income: number
+    expense: number
+}
+
+export interface UserProfileResponse {
+    id: number
+    username: string
+    email: string
+    fullName: string
+    role: Role
+    phoneNumber: string | null
+    dateOfBirth: string | null
+    addressLine1: string | null
+    addressLine2: string | null
+    city: string | null
+    province: string | null
+    postalCode: string | null
 }

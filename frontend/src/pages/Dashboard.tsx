@@ -1,30 +1,40 @@
 import PageContainer from "@/components/PageContainer.tsx";
 import {useEffect, useState} from "react";
-import type {AccountResponse, LoanResponse, TransactionResponse} from "@/types";
+import type {AccountResponse, LoanResponse, MonthlySummaryResponse, TransactionResponse} from "@/types";
 import api from "@/api/axios.ts";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 import MoneyAmount, {formatCurrency, isInbound, transTypeLabels} from "@/components/MoneyAmount.tsx";
 import {ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CreditCard, Plus} from "lucide-react";
+import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+
+function monthLabel(month: string) {
+    const [year, monthNum] = month.split('-')
+    const date = new Date(Number(year), Number(monthNum) - 1, 1)
+    return date.toLocaleDateString('en-US', { month: 'short' })
+}
 
 export default function Dashboard() {
     const [ accounts, setAccounts ] = useState<AccountResponse[]>([])
     const [ loans, setLoans ] = useState<LoanResponse[]>([])
     const [ recentTransactions, setRecentTransactions ] = useState<TransactionResponse[]>([])
+    const [ summary, setSummary ] = useState<MonthlySummaryResponse[]>([])
     const [ loading, setLoading ] = useState(true)
     const navigate = useNavigate()
 
     async function fetchDashboard() {
         try {
-            const [accountsRes, loansRes, txRes] = await Promise.all([
+            const [accountsRes, loansRes, txRes, summaryRes] = await Promise.all([
                 api.get<AccountResponse[]>('/accounts'),
                 api.get<LoanResponse[]>('/loans'),
                 api.get<TransactionResponse[]>('/transactions/recent'),
+                api.get<MonthlySummaryResponse[]>('/transactions/summary'),
             ])
             setAccounts(accountsRes.data)
             setLoans(loansRes.data)
             setRecentTransactions(txRes.data)
+            setSummary(summaryRes.data)
         } catch (err) {
             console.error(err)
         } finally {
@@ -84,6 +94,33 @@ export default function Dashboard() {
                             <p className="text-xl font-semibold mt-0.5 tabular-nums">{formatCurrency(totalOwed)}</p>
                         </div>
                     </div>
+                    <Card className="py-0">
+                        <CardContent className="p-5">
+                            <p className="text-xs font-medium text-muted-foreground mb-3">Income vs. spending (last 6 months)</p>
+                            {summary.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">Not enough activity yet to chart.</p>
+                            ) : (
+                                <div className="h-[220px]">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={summary.map(s => ({
+                                            month: monthLabel(s.month),
+                                            Income: s.income,
+                                            Spending: s.expense
+                                        }))}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted" />
+                                            <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} />
+                                            <YAxis fontSize={12} tickLine={false} axisLine={false} width={36} />
+                                            <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                                            <Legend />
+                                            <Bar dataKey="Income" fill="#B45309" radius={[4, 4, 0, 0]} />
+                                            <Bar dataKey="Spending" fill="#A1A1AA" radius={[4, 4, 0, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
                     <div className="grid md:grid-cols-[1.7fr_1fr] gap-4 items-start">
                         <Card className="py-0 gap-0">
                             <p className="text-xs font-medium text-muted-foreground px-4 pt-3.5 pb-2">Recent activity</p>
@@ -123,7 +160,7 @@ export default function Dashboard() {
                                     className="flex items-center gap-2 px-4 py-2.5 border-t cursor-pointer hover:bg-muted/50 transition-colors"
                                 >
                                     <div className={`w-2 h-2 rounded-full shrink-0 ${
-                                        account.type === 'CHECKING' ? 'bg-[#4338CA]' : 'bg-[#27272A] dark:bg-[#A1A1AA]'
+                                        account.type === 'CHECKING' ? 'bg-[#B45309]' : 'bg-[#27272A] dark:bg-[#A1A1AA]'
                                     }`} />
                                     <p className="text-xs flex-1 truncate">{account.nickname ?? (account.type === 'CHECKING' ? 'Checking' : 'Savings')}</p>
                                     <p className="text-xs font-semibold tabular-nums">{formatCurrency(account.balance, 0)}</p>

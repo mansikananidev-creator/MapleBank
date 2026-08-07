@@ -1,5 +1,7 @@
 package com.unibank.bankingSystem.controller;
 
+import com.unibank.bankingSystem.dto.EmailTransferRequest;
+import com.unibank.bankingSystem.dto.MonthlySummaryResponse;
 import com.unibank.bankingSystem.dto.TransactionRequest;
 import com.unibank.bankingSystem.dto.TransactionResponse;
 import com.unibank.bankingSystem.dto.TransferRequest;
@@ -33,6 +35,11 @@ public class TransactionController {
         return transactionService.transfer(request);
     }
 
+    @PostMapping("/transfer/email")
+    public TransactionResponse transferByEmail(@RequestBody EmailTransferRequest request) {
+        return transactionService.transferByEmail(request);
+    }
+
     @GetMapping("/account/{accountId}")
     public Page<TransactionResponse> getHistory(@PathVariable Long accountId, Pageable pageable) {
         return transactionService.getTransactionHistory(accountId, pageable);
@@ -41,5 +48,10 @@ public class TransactionController {
     @GetMapping("/recent")
     public List<TransactionResponse> getRecent() {
         return transactionService.getRecentTransactions();
+    }
+
+    @GetMapping("/summary")
+    public List<MonthlySummaryResponse> getSummary() {
+        return transactionService.getMonthlySummary();
     }
 }

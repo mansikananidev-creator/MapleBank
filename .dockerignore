@@ -1,0 +1,7 @@
+target/
+frontend/
+.git/
+.github/
+*.md
+.idea/
+*.iml

@@ -21,7 +21,7 @@ export default function NavBar() {
         <nav className="border-b border-border bg-background">
             <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
                 <div className="flex items-center gap-6">
-                    <span className="font-bold">UniBank</span>
+                    <span className="font-bold">Maple Bank</span>
                     <NavLink to="/dashboard" className={linkClass}>Dashboard</NavLink>
                     <NavLink to="/accounts" className={linkClass}>Accounts</NavLink>
                     <NavLink to="/transactions" className={linkClass}>Transactions</NavLink>

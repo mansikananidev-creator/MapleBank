@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import {Copy, Landmark, Plus, Wallet} from "lucide-react";
+import {Copy, Landmark, Mail, Plus, Wallet} from "lucide-react";
 import ArcCard from "@/components/ArcCard.tsx";
 
 export default function AccountDetailsPage() {
@@ -45,9 +45,14 @@ export default function AccountDetailsPage() {
     const [ transferToAccountNumber, setTransferToAccountNumber ] = useState('')
     const [ transferAmount, setTransferAmount ] = useState('')
     const [ transferDescription, setTransferDescription ] = useState('')
+    const [ eTransferOpen, setETransferOpen ] = useState(false)
+    const [ eTransferEmail, setETransferEmail ] = useState('')
+    const [ eTransferAmount, setETransferAmount ] = useState('')
+    const [ eTransferDescription, setETransferDescription ] = useState('')
     const [depositError, setDepositError] = useState('')
     const [withdrawError, setWithdrawError] = useState('')
     const [transferError, setTransferError] = useState('')
+    const [eTransferError, setETransferError] = useState('')
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -177,6 +182,36 @@ export default function AccountDetailsPage() {
         }
     }
 
+    async function handleETransfer() {
+        if (Number(eTransferAmount) <= 0) {
+            setETransferError('Amount must be greater than zero')
+            return
+        }
+        setSubmitting(true)
+        setETransferError('')
+        try {
+            const body = {
+                fromAccountId: Number(account?.id),
+                recipientEmail: eTransferEmail,
+                amount: Number(eTransferAmount),
+                description: eTransferDescription
+            }
+            await api.post<TransactionResponse>('/transactions/transfer/email', body)
+            setETransferEmail('')
+            setETransferAmount('')
+            setETransferDescription('')
+            await fetchAccounts()
+            await fetchAccount()
+            await fetchTransactions()
+            toast.success('e-Transfer sent')
+            setETransferOpen(false)
+        } catch (err: any) {
+            setETransferError(err.response?.data?.message ?? 'e-Transfer failed')
+        } finally {
+            setSubmitting(false)
+        }
+    }
+
     useEffect(() => {
         fetchAccounts()
     }, []);
@@ -191,7 +226,7 @@ export default function AccountDetailsPage() {
 
     const typeLabel = account?.type === 'CHECKING' ? 'Checking' : 'Savings'
     const statusLabel = account ? account.status.charAt(0) + account.status.slice(1).toLowerCase() : ''
-    const secondary = account?.type === 'CHECKING' ? 'text-[#C7D2FE]' : 'text-[#A1A1AA]'
+    const secondary = account?.type === 'CHECKING' ? 'text-[#FDE68A]' : 'text-[#A1A1AA]'
     const Icon = account?.type === 'CHECKING' ? Wallet : Landmark
     const activeAccounts = myAccounts.filter((a) => a.status === 'ACTIVE')
 
@@ -204,7 +239,7 @@ export default function AccountDetailsPage() {
             ) : (
                 <>
                     <ArcCard
-                        variant={account.type === 'CHECKING' ? 'indigo' : 'zinc'}
+                        variant={account.type === 'CHECKING' ? 'gold' : 'zinc'}
                         arcs="md"
                         className="h-[160px] mb-5"
                     >
@@ -253,11 +288,11 @@ export default function AccountDetailsPage() {
 
                                 <div className="space-y-4 py-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="deposit-amount">Amount (€)</Label>
+                                        <Label htmlFor="deposit-amount">Amount ($)</Label>
                                         <Input
                                             type="number"
                                             id="deposit-amount"
-                                            placeholder="0,00"
+                                            placeholder="0.00"
                                             value={depositAmount}
                                             onChange={(e) => setDepositAmount(e.target.value)}
                                         />
@@ -295,11 +330,11 @@ export default function AccountDetailsPage() {
 
                                 <div className="space-y-4 py-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="withdraw-amount">Amount (€)</Label>
+                                        <Label htmlFor="withdraw-amount">Amount ($)</Label>
                                         <Input
                                             type="number"
                                             id="withdraw-amount"
-                                            placeholder="0,00"
+                                            placeholder="0.00"
                                             value={withdrawAmount}
                                             onChange={(e) => setWithdrawAmount(e.target.value)}
                                         />
@@ -354,10 +389,10 @@ export default function AccountDetailsPage() {
                                                             key={a.id}
                                                             type="button"
                                                             onClick={() => setTransferToAccountNumber(a.accountNumber)}
-                                                            className="border border-[#C7D2FE] bg-[#EEF2FF] text-[#4338CA]
-                                                    dark:border-[#4338CA] dark:bg-[#1E1B4B] dark:text-[#A5B4FC]
+                                                            className="border border-[#FDE68A] bg-[#FEF3C7] text-[#B45309]
+                                                    dark:border-[#B45309] dark:bg-[#451A03] dark:text-[#FDBA74]
                                                     text-xs font-medium px-2.5 py-1 rounded-full
-                                                    hover:bg-[#E0E7FF] dark:hover:bg-[#312E81]"
+                                                    hover:bg-[#FDE68A] dark:hover:bg-[#78350F]"
                                                         >
                                                             {a.nickname}
                                                         </button>
@@ -367,11 +402,11 @@ export default function AccountDetailsPage() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="transfer-amount">Amount (€)</Label>
+                                        <Label htmlFor="transfer-amount">Amount ($)</Label>
                                         <Input
                                             type="number"
                                             id="transfer-amount"
-                                            placeholder="0,00"
+                                            placeholder="0.00"
                                             value={transferAmount}
                                             onChange={(e) => setTransferAmount(e.target.value)}
                                         />
@@ -393,6 +428,64 @@ export default function AccountDetailsPage() {
                                 <DialogFooter>
                                     <Button onClick={handleTransfer} disabled={submitting}>
                                         {submitting ? 'Loading...' : 'Make transfer'}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+
+                        <Dialog open={eTransferOpen} onOpenChange={(open) => { setETransferOpen(open); if (!open) setETransferError('') }}>
+                            <DialogTrigger asChild>
+                                <Button variant="outline">
+                                    <Mail size={16} /> e-Transfer
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Send an Interac e-Transfer</DialogTitle>
+                                </DialogHeader>
+
+                                <div className="space-y-4 py-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="etransfer-email">Recipient's email</Label>
+                                        <Input
+                                            type="email"
+                                            id="etransfer-email"
+                                            placeholder="name@example.com"
+                                            value={eTransferEmail}
+                                            onChange={(e) => setETransferEmail(e.target.value)}
+                                        />
+                                        <p className="text-xs text-muted-foreground">
+                                            Sends to any Maple Bank user by email — no account number needed.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="etransfer-amount">Amount ($)</Label>
+                                        <Input
+                                            type="number"
+                                            id="etransfer-amount"
+                                            placeholder="0.00"
+                                            value={eTransferAmount}
+                                            onChange={(e) => setETransferAmount(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="etransfer-description">Description (optional)</Label>
+                                        <Input
+                                            id="etransfer-description"
+                                            placeholder="e.g. Splitting rent"
+                                            value={eTransferDescription}
+                                            onChange={(e) => setETransferDescription(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                {eTransferError && <p className="text-sm text-destructive">{eTransferError}</p>}
+
+                                <DialogFooter>
+                                    <Button onClick={handleETransfer} disabled={submitting}>
+                                        {submitting ? 'Sending...' : 'Send e-Transfer'}
                                     </Button>
                                 </DialogFooter>
                             </DialogContent>

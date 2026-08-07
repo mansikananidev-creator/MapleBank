@@ -151,13 +151,13 @@ export default function AccountsPage() {
 
                         const isChecking = account.type === 'CHECKING'
                         const typeLabel = isChecking ? 'Checking' : 'Savings'
-                        const secondary = isChecking ? 'text-[#C7D2FE]' : 'text-[#A1A1AA]'
+                        const secondary = isChecking ? 'text-[#FDE68A]' : 'text-[#A1A1AA]'
                         const Icon = isChecking ? Wallet : Landmark
 
                         return (
                             <ArcCard
                                 key={account.id}
-                                variant={isChecking ? 'indigo' : 'zinc'}
+                                variant={isChecking ? 'gold' : 'zinc'}
                                 arcs="md"
                                 className="h-[160px] cursor-pointer"
                                 onClick={() => navigate(`/accounts/${account.id}`)}

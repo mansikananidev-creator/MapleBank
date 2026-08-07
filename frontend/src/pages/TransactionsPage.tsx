@@ -157,11 +157,11 @@ export default function TransactionsPage() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="deposit-amount">Amount (€)</Label>
+                                        <Label htmlFor="deposit-amount">Amount ($)</Label>
                                         <Input
                                             type="number"
                                             id="deposit-amount"
-                                            placeholder="0,00"
+                                            placeholder="0.00"
                                             value={depositAmount}
                                             onChange={(e) => setDepositAmount(e.target.value)}
                                         />
@@ -202,11 +202,11 @@ export default function TransactionsPage() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="withdraw-amount">Amount (€)</Label>
+                                        <Label htmlFor="withdraw-amount">Amount ($)</Label>
                                         <Input
                                             type="number"
                                             id="withdraw-amount"
-                                            placeholder="0,00"
+                                            placeholder="0.00"
                                             value={withdrawAmount}
                                             onChange={(e) => setWithdrawAmount(e.target.value)}
                                         />
@@ -268,10 +268,10 @@ export default function TransactionsPage() {
                                                             key={a.id}
                                                             type="button"
                                                             onClick={() => setTransferToNumber(a.accountNumber)}
-                                                            className="border border-[#C7D2FE] bg-[#EEF2FF] text-[#4338CA]
-                                                            dark:border-[#4338CA] dark:bg-[#1E1B4B] dark:text-[#A5B4FC]
+                                                            className="border border-[#FDE68A] bg-[#FEF3C7] text-[#B45309]
+                                                            dark:border-[#B45309] dark:bg-[#451A03] dark:text-[#FDBA74]
                                                             text-xs font-medium px-2.5 py-1 rounded-full
-                                                            hover:bg-[#E0E7FF] dark:hover:bg-[#312E81]"
+                                                            hover:bg-[#FDE68A] dark:hover:bg-[#78350F]"
                                                         >
                                                             {a.nickname}
                                                         </button>
@@ -281,11 +281,11 @@ export default function TransactionsPage() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="transfer-amount">Amount (€)</Label>
+                                        <Label htmlFor="transfer-amount">Amount ($)</Label>
                                         <Input
                                             type="number"
                                             id="transfer-amount"
-                                            placeholder="0,00"
+                                            placeholder="0.00"
                                             value={transferAmount}
                                             onChange={(e) => setTransferAmount(e.target.value)}
                                         />
@@ -323,15 +323,15 @@ export default function TransactionsPage() {
                                 <div
                                     key={account.id}
                                     onClick={() => setAccountId(String(account.id))}
-                                    className={cn("cursor-pointer flex items-center gap-2.5 px-4 py-2.5 border-t hover:bg-muted/50 transition-colors", isSelected && "bg-[#EEF2FF] dark:bg-[#1E1B4B]")}
+                                    className={cn("cursor-pointer flex items-center gap-2.5 px-4 py-2.5 border-t hover:bg-muted/50 transition-colors", isSelected && "bg-[#FEF3C7] dark:bg-[#451A03]")}
                                 >
                                     <div className={`w-2 h-2 rounded-full shrink-0 ${
-                                        account.type === 'CHECKING' ? 'bg-[#4338CA]' : 'bg-[#27272A] dark:bg-[#A1A1AA]'
+                                        account.type === 'CHECKING' ? 'bg-[#B45309]' : 'bg-[#27272A] dark:bg-[#A1A1AA]'
                                     }`} />
-                                    <p className={cn("text-xs flex-1 truncate", isSelected && "text-[#4338CA] dark:text-[#A5B4FC]")}>
+                                    <p className={cn("text-xs flex-1 truncate", isSelected && "text-[#B45309] dark:text-[#FDBA74]")}>
                                         {account.nickname}
                                     </p>
-                                    <p className={cn("text-xs font-semibold tabular-nums", isSelected && "text-[#4338CA] dark:text-[#A5B4FC]")}>
+                                    <p className={cn("text-xs font-semibold tabular-nums", isSelected && "text-[#B45309] dark:text-[#FDBA74]")}>
                                         {formatCurrency(account.balance)}
                                     </p>
                                 </div>

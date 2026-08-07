@@ -1,15 +1,15 @@
 import React from "react";
 
 type ArcCardProps = {
-    variant?: 'indigo' | 'zinc'
+    variant?: 'gold' | 'zinc'
     arcs?: 'sm' | 'md' | 'lg'
 } & React.ComponentProps<'div'>
 
 const variantClasses = {
-    indigo: {
-        bg: 'bg-[#4338CA]',
-        circle1: 'bg-[#3B31B5]',
-        circle2: 'bg-[#372DA8]',
+    gold: {
+        bg: 'bg-[#B45309]',
+        circle1: 'bg-[#9C4508]',
+        circle2: 'bg-[#8B3D07]',
     },
     zinc: {
         bg: 'bg-[#27272A]',
@@ -33,7 +33,7 @@ const arcClasses = {
     },
 }
 
-export default function ArcCard({ variant = 'indigo', arcs = 'sm', className, children, ...props }: ArcCardProps) {
+export default function ArcCard({ variant = 'gold', arcs = 'sm', className, children, ...props }: ArcCardProps) {
     return (
         <div className={`relative overflow-hidden rounded-[20px] ${variantClasses[variant].bg} ${className}`} {...props}>
             <div className={`absolute rounded-full ${variantClasses[variant].circle1} ${arcClasses[arcs].circle1}`} />

@@ -145,7 +145,7 @@ export default function LoansPage() {
                                 <Input
                                     type="number"
                                     id="loan-amount"
-                                    placeholder="0.0€"
+                                    placeholder="0.00"
                                     value={applyAmount}
                                     onChange={(e) => setApplyAmount(e.target.value)}
                                 />
@@ -217,7 +217,7 @@ export default function LoansPage() {
                                                     <Input
                                                         type="number"
                                                         id="repay-amount"
-                                                        placeholder="0.0€"
+                                                        placeholder="0.00"
                                                         value={repayAmount}
                                                         onChange={(e) => setRepayAmount(e.target.value)}
                                                     />

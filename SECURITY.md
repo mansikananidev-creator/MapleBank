@@ -15,7 +15,7 @@ Please do not report security vulnerabilities through public GitHub issues.
 
 If you discover a security vulnerability, report it privately through GitHub's built-in advisory tool:
 
-1. Go to the [Security tab](https://github.com/j0hn-char/UniBank/security) of this repository
+1. Go to the [Security tab](https://github.com/mansikananidev-creator/MapleBank/security) of this repository
 2. Click **"Report a vulnerability"** to open a private security advisory
 3. Include as much of the following as you can:
     - A description of the vulnerability and its potential impact

@@ -13,6 +13,7 @@ import com.unibank.bankingSystem.repository.LoanRepository;
 import com.unibank.bankingSystem.repository.TransactionRepository;
 import com.unibank.bankingSystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -75,16 +76,8 @@ public class LoanService {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public LoanResponse approveLoan(Long loanId) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("User not found")
-        );
-
-        if(user.getRole() != Role.ADMIN) {
-            throw new UnauthorizedException("You are not an admin");
-        }
-
         Loan loan = loanRepository.findById(loanId).orElseThrow(
                 () -> new ResourceNotFoundException("Loan not found")
         );
@@ -121,16 +114,8 @@ public class LoanService {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public LoanResponse rejectLoan(Long loanId) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("User not found")
-        );
-
-        if(user.getRole() != Role.ADMIN) {
-            throw new UnauthorizedException("You are not an admin");
-        }
-
         Loan loan = loanRepository.findById(loanId).orElseThrow(
                 () -> new ResourceNotFoundException("Loan not found")
         );
@@ -157,9 +142,19 @@ public class LoanService {
     }
 
     public LoanResponse repayLoan(Long loanId, LoanRepaymentRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException("User not found")
+        );
+
         Loan loan = loanRepository.findById(loanId).orElseThrow(
                 () -> new ResourceNotFoundException("Loan not found")
         );
+
+        if(!loan.getBorrower().getId().equals(user.getId())) {
+            throw new UnauthorizedException("You do not own this loan");
+        }
+
         Account account = loan.getAccount();
 
         if(loan.getStatus() == LoanStatus.PAID_OFF) {
@@ -223,16 +218,8 @@ public class LoanService {
         ).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<LoanResponse> getPendingLoans() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("User not found")
-        );
-
-        if(user.getRole() != Role.ADMIN) {
-            throw new UnauthorizedException("You need to be an admin for this action");
-        }
-
         List<Loan> loans = loanRepository.findByStatus(LoanStatus.PENDING);
 
         return loans.stream().map(loan ->
